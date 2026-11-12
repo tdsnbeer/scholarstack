@@ -346,6 +346,18 @@
     return cleanList(JSON.parse(text));
   }
 
+  /** One-code hand-off: the list sits on the site locked (AES-256-GCM, iv|ciphertext|tag in base64url); the key comes
+   *  from the QR code's link fragment, which browsers never send to the site. Wrong key or altered file: throws. */
+  async function openSealed(keyB64, lockedB64) {
+    const subtle = (root.crypto || globalThis.crypto).subtle;
+    const key = await subtle.importKey('raw', bytesFromB64url(keyB64), 'AES-GCM', false, ['decrypt']);
+    const all = bytesFromB64url(String(lockedB64).trim());
+    const plain = await subtle.decrypt({ name: 'AES-GCM', iv: all.slice(0, 12) }, key, all.slice(12));
+    const payload = new TextDecoder().decode(plain);
+    if (!/^[A-Za-z0-9_-]+$/.test(payload)) throw new Error('not a ScholarStack list');
+    return decodeHash('#d=' + payload);
+  }
+
   /** Anyone can craft a link, so a list is rebuilt from known fields with checked types before it is stored. */
   function cleanList(data) {
     if (!data || !Array.isArray(data.s) || data.s.length > 200) throw new Error('not a ScholarStack list');
@@ -399,6 +411,6 @@
   const api = { cleanState, STATUSES, STATUS_LABEL, SKIP_REASONS, PROMPTED_BY, FRICTIONS, THEMES, WINDOW_DAYS, FREEZE_DAY, HARD_STOP,
     iso, addDays, daysBetween, today, sortItems, deadlineLabel, sourceLabel, mark, statusOf, intends, nextUp, nextStep,
     essayGroups, requiredSubmissions, minDeadlines, countable, eligibleForScoring, setEligible, maybeFreeze, metrics, verdict, restartWindow, checkin,
-    buildICS, buildSlotICS, exportCSV, summaryText, decodeHash, cleanList, b64urlFromBytes, bytesFromB64url, nextWeekday };
+    buildICS, buildSlotICS, exportCSV, summaryText, decodeHash, openSealed, cleanList, b64urlFromBytes, bytesFromB64url, nextWeekday };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.SS = api;
 })(this);

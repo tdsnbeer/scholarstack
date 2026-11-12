@@ -1,5 +1,6 @@
-// Offline copy of the app shell. The scholarship list is never fetched: it lives in the link fragment and on the phone.
-const CACHE = 'scholarstack-v2';
+// Offline copy of the app shell. The list arrives once, locked (l/<id>.json, opened with the key from the code's link),
+// and then lives on the phone.
+const CACHE = 'scholarstack-v3';
 const FILES = ['./', 'index.html', 'core.js', 'icon.svg', 'icon-180.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())));

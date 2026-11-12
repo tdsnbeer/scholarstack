@@ -101,8 +101,14 @@ async function boot() {
   const h = location.hash;
   let fresh = null, partMsg = null;
   try {
+    const km = /^#k=([A-Za-z0-9_-]{43})&f=([a-f0-9]{10})$/.exec(h);
     const pm = /^#p=(\d+)-(\d+)-([a-z0-9]+)-([A-Za-z0-9_-]+)$/.exec(h);
-    if (pm) {
+    if (km) {                                   // one code: fetch the locked list, open it with the key from the link
+      const r = await fetch('l/' + km[2] + '.json', { cache: 'no-store' });
+      if (!r.ok) throw new Error('the list file is not on the site yet');
+      fresh = await SS.openSealed(km[1], (await r.json()).data);
+      history.replaceState(null, '', location.pathname);   // the key does not stay in the address bar or history
+    } else if (pm) {
       const [, i, n, id, chunk] = pm, parts = load(K_PARTS, {});
       parts[id] = parts[id] || { n: +n, got: {} }; parts[id].got[i] = chunk;
       localStorage.setItem(K_PARTS, JSON.stringify(parts));
@@ -361,7 +367,7 @@ function restore(f) {
 }
 
 document.getElementById('nav').addEventListener('click', ev => { const b = ev.target.closest('button'); if (b) { TAB = b.dataset.tab; render(); } });
-window.addEventListener('hashchange', () => { if (/^#[pdj]=/.test(location.hash)) location.reload(); });
+window.addEventListener('hashchange', () => { if (/^#[pdjk]=/.test(location.hash)) location.reload(); });
 boot();
 </script>
 </body>
