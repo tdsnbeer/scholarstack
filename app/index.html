@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="description" content="A private scholarship tracker. Your list and progress stay on your phone.">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ScholarStack">
+<meta name="theme-color" content="#1d3b2a">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>ScholarStack</title>
+<style>
+:root{--bg:#f6f4ee;--card:#fff;--ink:#1c1f1d;--mute:#5d665f;--line:#dcd8cc;--brand:#1d3b2a;--accent:#c7652a;--ok:#2e7d4f;--warn:#b3261e;--soft:#eef3ee}
+*{box-sizing:border-box}html,body{margin:0}
+body{font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+header{background:var(--brand);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:5}
+header h1{font-size:19px;margin:0;letter-spacing:.2px}header p{margin:2px 0 0;font-size:13px;opacity:.85}
+main{padding:12px;max-width:640px;margin:0 auto}
+h2{font-size:17px;margin:18px 4px 8px}h3{font-size:17px;margin:4px 0 2px;line-height:1.25}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 12px}
+.card.done{opacity:.72}.card.skipped{opacity:.55}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{flex:1}
+.chip{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--brand);text-transform:uppercase;letter-spacing:.4px}
+.chip.local,.chip.regional{background:#fbe9dc;color:#8a3e12}.chip.check{background:#f3e6e6;color:var(--warn)}
+.amt{font-weight:700;color:var(--brand)}
+.due{font-weight:600;margin:4px 0}.due.soon{color:var(--warn)}.due.none{color:var(--mute);font-weight:500}
+.src{font-size:13px;color:var(--mute)}.src a{color:var(--mute)}
+details{margin:8px 0}summary{cursor:pointer;color:var(--brand);font-weight:600;min-height:32px;display:flex;align-items:center}
+details ul{margin:4px 0 6px 18px;padding:0}.note{font-size:14px;background:#fff8e6;border-radius:8px;padding:8px;margin:6px 0}
+.elig{background:#fff8e6;border-radius:8px;padding:8px;margin:8px 0}.elig .opts{margin-top:6px}
+a.btn,button{font:inherit;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);min-height:44px;padding:8px 12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+a.btn.primary,button.primary{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
+button.ghost{border-color:transparent;background:transparent;color:var(--brand);text-decoration:underline;min-height:36px;padding:4px}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:10px}
+.seg button{font-size:12px;padding:6px 2px;min-height:48px;line-height:1.15}
+.seg button.on{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:700}
+.seg button.on.skip{background:#7a7a7a;border-color:#7a7a7a}.seg button.on.sub{background:var(--ok);border-color:var(--ok)}
+.meta{font-size:13px;color:var(--mute);margin-top:6px}
+.acts{display:flex;gap:8px;margin-top:8px}.acts>*{flex:1}
+nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav button{border:0;border-radius:0;min-height:60px;font-size:13px;flex-direction:column;gap:0;color:var(--mute);background:#fff}
+nav button b{font-size:20px;line-height:1}nav button.on{color:var(--brand);font-weight:700}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.opts button{flex:1 1 calc(50% - 8px)}.opts button.on{background:var(--brand);color:#fff}
+.opts.three button{flex:1 1 calc(33% - 8px)}
+.sheet-bg{position:fixed;inset:0;background:#0006;z-index:20;display:flex;align-items:flex-end}
+.sheet{background:#fff;width:100%;max-width:640px;margin:0 auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.sheet h3{margin:0 0 4px}.sheet p{margin:4px 0 8px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:var(--soft);border-radius:12px;padding:10px}
+.stat b{display:block;font-size:26px;color:var(--brand)}.stat span{font-size:13px;color:var(--mute)}
+.verdict{border-left:5px solid var(--accent);background:#fff;padding:10px 12px;border-radius:8px;margin:10px 0}
+.bar{display:flex;align-items:center;gap:8px;font-size:14px;margin:4px 0}.bar i{display:block;height:10px;background:var(--accent);border-radius:5px}
+.next{background:#fff;border:2px solid var(--accent);border-radius:14px;padding:10px 14px;margin-bottom:12px}
+.next ol{margin:4px 0 0 18px;padding:0}.next li{margin:4px 0}
+.muted{color:var(--mute);font-size:14px}.small{font-size:13px}
+.banner{background:#fff3c4;border:1px solid #e9d37a;border-radius:12px;padding:10px 12px;margin-bottom:12px}
+input[type=date],input[type=time],select,textarea{font:inherit;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;width:100%;background:#fff}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:99px;z-index:30;font-size:14px}
+.filter{display:flex;gap:6px;margin:0 0 10px}.filter button{flex:1;min-height:38px;font-size:14px}.filter button.on{background:var(--brand);color:#fff}
+</style>
+</head>
+<body>
+<header><h1>ScholarStack</h1><p id="sub">Your scholarships, by deadline. Saved only on this phone.</p></header>
+<main id="main"><p class="muted">Loading…</p></main>
+<nav id="nav" hidden>
+  <button data-tab="list" class="on"><b>☰</b>List</button>
+  <button data-tab="week"><b>✓</b>Check-in</button>
+  <button data-tab="essays"><b>✎</b>Essays</button>
+  <button data-tab="pilot"><b>▦</b>Numbers</button>
+</nav>
+<script src="core.js"></script>
+<script>
+'use strict';
+const K_STATE = 'scholarstack:v1', K_LIST = 'scholarstack:list', K_PARTS = 'scholarstack:parts';
+let LIST = null, STATE = null, TAB = 'list', FILTER = 'open';
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const now = () => SS.today();
+const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '#';
+
+function load(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+function save() { localStorage.setItem(K_STATE, JSON.stringify(STATE)); }
+function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
+function download(name, text, type) {
+  const blob = new Blob([text], { type });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+}
+async function shareFile(name, text, type) {
+  const f = new File([text], name, { type });
+  if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: name }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  download(name, text, type);
+}
+
+// ---- boot: take a list from the link (#d= / #j= / #p= parts) or from storage ----
+async function boot() {
+  STATE = load(K_STATE, { items: {}, pilot: {}, settings: {} });
+  const h = location.hash;
+  let fresh = null, partMsg = null;
+  try {
+    const pm = /^#p=(\d+)-(\d+)-([a-z0-9]+)-([A-Za-z0-9_-]+)$/.exec(h);
+    if (pm) {
+      const [, i, n, id, chunk] = pm, parts = load(K_PARTS, {});
+      parts[id] = parts[id] || { n: +n, got: {} }; parts[id].got[i] = chunk;
+      localStorage.setItem(K_PARTS, JSON.stringify(parts));
+      const got = Object.keys(parts[id].got).length;
+      if (got >= +n) {
+        let full = ''; for (let k = 1; k <= +n; k++) full += parts[id].got[k];
+        fresh = await SS.decodeHash('#d=' + full);
+        delete parts[id]; localStorage.setItem(K_PARTS, JSON.stringify(parts));
+        history.replaceState(null, '', location.pathname + '#d=' + full);
+      } else {
+        const missing = []; for (let k = 1; k <= +n; k++) if (!parts[id].got[k]) missing.push(k);
+        partMsg = { got, n: +n, missing, last: i };
+      }
+    } else if (/^#[dj]=/.test(h)) {
+      fresh = await SS.decodeHash(h);
+    }
+  } catch (e) { partMsg = { error: 'That code could not be read (' + e.message + '). Scan it again.' }; }
+  if (fresh) { localStorage.setItem(K_LIST, JSON.stringify(fresh)); STATE.listMade = fresh.made; save(); if (!STATE.setupDone) TAB = 'setup'; }
+  LIST = load(K_LIST, null);
+  if (partMsg) return renderParts(partMsg);
+  if (!LIST) return renderEmpty();
+  $('#nav').hidden = false;
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  render();
+}
+
+function renderParts(m) {
+  $('#main').innerHTML = m.error ? '<div class="card"><h3>Hmm.</h3><p>' + esc(m.error) + '</p></div>' :
+    '<div class="card"><h3>Got code ' + m.last + ' ✓ (' + m.got + ' of ' + m.n + ' so far)</h3><p>Now scan code ' + m.missing.join(' and ') +
+    ' on the laptop screen with your camera, and tap the link it shows.</p><p class="muted">Your list is put together on this phone; it is never uploaded anywhere.</p></div>';
+}
+function renderEmpty() {
+  $('#main').innerHTML = '<div class="card"><h3>No list on this phone yet</h3><p>ScholarStack is a private scholarship tracker. ' +
+    'Your matched list arrives by scanning a code shown on your family\'s laptop. Nothing you enter here leaves this phone.</p></div>';
+}
+
+// ---- rendering -----------------------------------------------------------------
+function items() { return LIST.s; }
+function render() {
+  SS.maybeFreeze(items(), STATE, now()) && save();
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === TAB));
+  const f = { list: renderList, week: renderWeek, essays: renderEssays, pilot: renderPilot, setup: renderSetup }[TAB] || renderList;
+  $('#main').innerHTML = f(); window.scrollTo(0, 0);
+}
+
+function isStandalone() { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; }
+function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+
+function renderSetup() {
+  return '<h2>Two quick steps (1 minute)</h2>' +
+    '<div class="card"><h3>1. Put the reminders in your calendar</h3><p class="muted">A reminder a week and two days before every deadline, ' +
+    'a Monday "plan your week" and a Friday 1-minute check-in. They live in your own calendar.</p>' + calendarControls() + '</div>' +
+    '<div class="card"><h3>2. Put ScholarStack on your home screen</h3><p class="muted">' +
+    (isIOS() ? 'Tap the Share button <b>⬆︎</b> at the bottom of Safari, then <b>Add to Home Screen</b>. Use that icon from now on.' :
+      'Tap the browser menu <b>⋮</b>, then <b>Add to Home screen</b>. Use that icon from now on.') + '</p></div>' +
+    '<button class="primary" style="width:100%" onclick="STATE.setupDone=true;save();TAB=\'list\';render()">Show my scholarships</button>';
+}
+
+function calendarControls() {
+  const s = STATE.settings || {};
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const sel = (id, v) => '<select id="' + id + '">' + days.map((d, i) => '<option value="' + i + '"' + (i == v ? ' selected' : '') + '>' + d + '</option>').join('') + '</select>';
+  return '<div class="grid"><label class="small">Plan day' + sel('cal-plan', s.planDay ?? 1) + '</label><label class="small">Check-in day' + sel('cal-check', s.checkinDay ?? 5) +
+    '</label></div><label class="small">Reminder time<input type="time" id="cal-time" value="' + esc(s.time || '19:00') + '"></label>' +
+    '<div class="acts"><button class="primary" onclick="getCalendar()">Add reminders to calendar</button></div>';
+}
+function getCalendar() {
+  STATE.settings = { planDay: +$('#cal-plan').value, checkinDay: +$('#cal-check').value, time: $('#cal-time').value || '19:00' };
+  STATE.calendarAt = now(); save();
+  const ics = SS.buildICS(items(), STATE, Object.assign({ appUrl: location.origin + location.pathname }, STATE.settings), now());
+  shareFile('scholarstack-reminders.ics', ics, 'text/calendar');
+  toast('Calendar file ready: open it and tap "Add All"');
+}
+
+function nextUpBox() {
+  const n = SS.nextUp(items(), STATE, now());
+  if (!n.length) return '';
+  return '<div class="next"><b>Next up</b><ol>' + n.map(it => '<li><b>' + esc(it.name) + '</b> · ' + esc(SS.deadlineLabel(it, now())) +
+    '<br><span class="small">' + esc(SS.nextStep(SS.statusOf(STATE, it.id))) + '</span></li>').join('') + '</ol></div>';
+}
+
+function renderList() {
+  const all = SS.sortItems(items(), now());
+  const done = it => ['submitted', 'skipped'].includes(SS.statusOf(STATE, it.id));
+  const shown = all.filter(it => FILTER === 'all' || (FILTER === 'open' ? !done(it) : done(it)));
+  const stale = STATE.listMade && SS.daysBetween(STATE.listMade, now()) > 45;
+  return (stale ? '<div class="banner">This list was checked on ' + esc(STATE.listMade) + '. Ask for a fresh one (deadlines for spring awards get posted Dec–Feb).</div>' : '') +
+    (!STATE.calendarAt ? '<div class="banner">Reminders not in your calendar yet. <button class="ghost" onclick="TAB=\'week\';render()">Add them</button></div>' : '') +
+    nextUpBox() +
+    '<div class="filter">' + [['open', 'To do'], ['done', 'Done/skipped'], ['all', 'All']].map(([k, l]) =>
+      '<button class="' + (FILTER === k ? 'on' : '') + '" onclick="FILTER=\'' + k + '\';render()">' + l + '</button>').join('') + '</div>' +
+    (shown.length ? shown.map(card).join('') : '<p class="muted">Nothing here.</p>') +
+    '<p class="muted small">Deadlines were checked on ' + esc(LIST.made) + ' against the source shown on each card. Always confirm on the application page.</p>';
+}
+
+function card(it) {
+  const e = (STATE.items || {})[it.id] || {}, st = e.status || 'todo', n = it.deadline ? SS.daysBetween(now(), it.deadline) : null;
+  const dueCls = !it.deadline ? 'none' : (n >= 0 && n <= 14 ? 'soon' : '');
+  const segs = SS.STATUSES.map(s => '<button class="' + (st === s ? 'on ' : '') + (s === 'skipped' ? 'skip' : s === 'submitted' ? 'sub' : '') +
+    '" onclick="tap(\'' + it.id + '\',\'' + s + '\')">' + SS.STATUS_LABEL[s].replace(' ', '<br>') + '</button>').join('');
+  const meta = [];
+  if (e.startedAt) meta.push('Started ' + e.startedAt);
+  if (e.draftedAt) meta.push('Essay ' + e.draftedAt + (e.essayMin ? ' (' + e.essayMin + ' min)' : ''));
+  if (e.submittedAt) meta.push('Submitted ' + e.submittedAt);
+  if (e.skipReason) meta.push('Skipped: ' + e.skipReason);
+  const hint = !it.deadline && (it.opens_hint || it.last_year_deadline) ?
+    '<div class="src">' + (it.last_year_deadline ? 'Last year it closed ' + esc(it.last_year_deadline) + '. ' : '') + (it.opens_hint ? 'Expected to open ' + esc(it.opens_hint) + '.' : '') + '</div>' : '';
+  const theme = (e.essayTheme || (it.essay && it.essay.theme)) || '';
+  return '<article class="card ' + (st === 'submitted' ? 'done' : st === 'skipped' ? 'skipped' : '') + '" id="c-' + esc(it.id) + '">' +
+    '<div class="row"><span class="chip ' + esc(it.scope) + '">' + esc(it.scope) + '</span>' + (it.fit === 'check' ? '<span class="chip check">check fit</span>' : '') +
+    '<span class="sp"></span><span class="amt">' + esc(it.amount) + '</span></div>' +
+    '<h3>' + esc(it.name) + '</h3>' +
+    '<div class="due ' + dueCls + '">' + esc(SS.deadlineLabel(it, now())) + (it.deadline_status === 'expected' ? ' (expected)' : '') + '</div>' + hint +
+    '<div class="src">' + esc(SS.sourceLabel(it)) + ' · <a href="' + esc(safeUrl(it.deadline_source)) + '" target="_blank" rel="noopener noreferrer">source</a></div>' +
+    '<details><summary>What it needs (' + (it.requirements || []).length + ')</summary><ul>' + (it.requirements || []).map(r => '<li>' + esc(r) + '</li>').join('') + '</ul>' +
+    (it.essay ? '<p><b>Essay:</b> ' + esc(it.essay.prompt) + (it.essay.words ? ' (' + esc(it.essay.words) + ' words)' : '') + '</p>' : '<p><b>Essay:</b> none listed on the page.</p>') +
+    (it.eligibility_note ? '<p class="note">' + esc(it.eligibility_note) + '</p>' : '') +
+    '<p class="small">When you open it, what is the essay about? (helps reuse)</p><div class="opts three">' +
+    Object.entries(Object.assign({ none: 'No essay' }, SS.THEMES)).map(([k, l]) => '<button class="' + (theme === k ? 'on' : '') + '" onclick="setTheme(\'' + it.id + '\',\'' + k + '\')">' + esc(l.split(' (')[0]) + '</button>').join('') +
+    '</div><label class="row small"><input type="checkbox" ' + (SS.intends(STATE, it) ? 'checked' : '') + ' onchange="setIntend(\'' + it.id + '\',this.checked)"> I plan to apply to this one</label></details>' +
+    (it.fit === 'check' ? '<div class="elig"><span class="small">' + (e.eligible === true ? '✓ You confirmed you qualify.' : e.eligible === false ? 'You said you don\'t qualify.' : 'Not sure you qualify yet. After reading the rules:') +
+      '</span><div class="opts"><button class="' + (e.eligible === true ? 'on' : '') + '" onclick="setElig(\'' + it.id + '\',true)">I qualify</button>' +
+      '<button class="' + (e.eligible === false ? 'on' : '') + '" onclick="setElig(\'' + it.id + '\',false)">I don\'t</button></div></div>' : '') +
+    '<div class="acts"><a class="btn primary" href="' + esc(safeUrl(it.link)) + '" target="_blank" rel="noopener noreferrer">Open application ↗</a>' +
+    (it.deadline && n >= 0 ? '<button onclick="bookSlot(\'' + it.id + '\')">Book 45 min</button>' : '') + '</div>' +
+    '<div class="seg">' + segs + '</div>' + (meta.length ? '<div class="meta">' + esc(meta.join(' · ')) + '</div>' : '') + '</article>';
+}
+function byId(id) { return items().find(x => x.id === id); }
+function setIntend(id, v) { const e = (STATE.items[id] = STATE.items[id] || { status: 'todo', history: [] }); e.intend = v; save(); }
+function setElig(id, v) { SS.setEligible(STATE, id, v); save(); rerenderCard(id); toast(v ? 'Thanks. It now counts toward the pilot.' : 'Got it. It won\'t count.'); }
+function setTheme(id, k) { const e = (STATE.items[id] = STATE.items[id] || { status: 'todo', history: [] }); e.essayTheme = k; save(); rerenderCard(id); }
+function rerenderCard(id) { const el = document.getElementById('c-' + id); if (el) { const open = el.querySelector('details').open; el.outerHTML = card(byId(id)); if (open) document.getElementById('c-' + id).querySelector('details').open = true; } else render(); }
+
+// ---- sheets (one-tap answers) -------------------------------------------------------
+function sheet(html) {
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  bg.innerHTML = '<div class="sheet">' + html + '<button class="ghost" style="width:100%" data-close>Cancel</button></div>';
+  bg.addEventListener('click', ev => { if (ev.target === bg || ev.target.hasAttribute('data-close')) bg.remove(); });
+  document.body.appendChild(bg); return bg;
+}
+function done(id, status, extra) {
+  SS.mark(STATE, id, status, extra, now()); save();
+  document.querySelector('.sheet-bg') && document.querySelector('.sheet-bg').remove();
+  if (TAB === 'list' && FILTER === 'open' && ['submitted', 'skipped'].includes(status)) render(); else rerenderCard(id);
+  toast(status === 'submitted' ? 'Submitted! Nice work.' : status === 'skipped' ? 'Skipped. Thanks for saying why.' : 'Saved');
+}
+function tap(id, status) {
+  const it = byId(id);
+  if (status === 'skipped') {
+    const bg = sheet('<h3>Why skip ' + esc(it.name) + '?</h3><p>One tap. This is the most useful thing you can tell us.</p><div class="opts">' +
+      SS.SKIP_REASONS.map((r, i) => '<button data-r="' + i + '">' + esc(r) + '</button>').join('') + '</div>');
+    bg.querySelectorAll('[data-r]').forEach(b => b.onclick = () => done(id, 'skipped', { reason: SS.SKIP_REASONS[+b.dataset.r] }));
+  } else if (status === 'submitted') {
+    const bg = sheet('<h3>Submitted ' + esc(it.name) + ' 🎉</h3><label class="small">Date submitted<input type="date" id="sub-date" value="' + now() + '" max="' + now() + '"></label>' +
+      '<p>What got you to do it? (one tap saves)</p><div class="opts">' + SS.PROMPTED_BY.map((r, i) => '<button data-p="' + i + '">' + esc(r) + '</button>').join('') + '</div>');
+    bg.querySelectorAll('[data-p]').forEach(b => b.onclick = () => done(id, 'submitted', { date: $('#sub-date').value || now(), prompted: SS.PROMPTED_BY[+b.dataset.p] }));
+  } else if (status === 'drafted') {
+    let reused = false;
+    const bg = sheet('<h3>Essay drafted for ' + esc(it.name) + '</h3><div class="opts"><button class="on" data-u="0">New essay</button><button data-u="1">Reused one I had</button></div>' +
+      '<p>About how many minutes did it take? (tap saves; a guess is fine)</p><div class="opts three">' +
+      [10, 20, 30, 45, 60, 90, 120, 180].map(m => '<button data-m="' + m + '">' + m + '</button>').join('') + '</div><button class="ghost" data-m="0">Skip the minutes</button>');
+    bg.querySelectorAll('[data-u]').forEach(b => b.onclick = () => { reused = b.dataset.u === '1'; bg.querySelectorAll('[data-u]').forEach(x => x.classList.toggle('on', x === b)); });
+    bg.querySelectorAll('[data-m]').forEach(b => b.onclick = () => done(id, 'drafted', +b.dataset.m ? { essayMin: +b.dataset.m, reused, timed: false } : { reused }));
+  } else done(id, status, {});
+}
+function bookSlot(id) {
+  const it = byId(id), d = SS.addDays(now(), 1);
+  const bg = sheet('<h3>Book 45 minutes for ' + esc(it.name) + '</h3><p>People who pick a time finish more often. It goes into your calendar with a 10-minute warning.</p>' +
+    '<div class="grid"><label class="small">Day<input type="date" id="slot-d" value="' + d + '" min="' + now() + '" max="' + esc(it.deadline) + '"></label>' +
+    '<label class="small">Time<input type="time" id="slot-t" value="' + esc((STATE.settings || {}).time || '19:00') + '"></label></div><div class="acts"><button class="primary" id="slot-go">Add to calendar</button></div>');
+  bg.querySelector('#slot-go').onclick = () => { shareFile('scholarstack-' + id + '.ics', SS.buildSlotICS(it, $('#slot-d').value, $('#slot-t').value, now()), 'text/calendar'); bg.remove(); };
+}
+
+// ---- weekly check-in --------------------------------------------------------------
+let CK = {};
+function renderWeek() {
+  const p = STATE.pilot || {}, wk = p.day0 ? Math.floor(SS.daysBetween(p.day0, now()) / 7) + 1 : 1;
+  const prev = (p.weeks || []).find(w => w.week === wk);
+  CK = prev ? Object.assign({}, prev) : {};
+  const opt = (key, vals) => '<div class="opts">' + vals.map(v => '<button class="' + (CK[key] === v ? 'on' : '') + '" onclick="ck(this,\'' + key + '\',' + JSON.stringify(v).replace(/"/g, '&quot;') + ')">' + esc(v === true ? 'Yes' : v === false ? 'No' : v) + '</button>').join('') + '</div>';
+  const since = SS.addDays(now(), -7), hist = [];
+  for (const it of items()) { const e = (STATE.items || {})[it.id]; if (e) for (const h of e.history || []) if (h.at > since) hist.push(SS.STATUS_LABEL[h.s] + ': ' + it.name); }
+  return '<h2>Weekly check-in · week ' + wk + (p.day0 ? '' : ' (starts the pilot)') + '</h2>' +
+    (prev ? '<p class="muted">Already done this week; saving again updates it.</p>' : '') +
+    '<div class="card"><b>This week you marked</b><p class="small">' + (hist.length ? hist.map(esc).join('<br>') : 'Nothing yet. Mark things on the List tab first if you did them.') + '</p></div>' +
+    '<div class="card"><b>1. Did your ScholarStack reminder show up on time this week?</b>' + opt('nudgeOnTime', [true, false]) +
+    '<b>2. What got in the way most?</b>' + opt('friction', SS.FRICTIONS) +
+    '<b>3. Minutes a parent helped this week</b><div class="opts three">' + [0, 10, 20, 30, 60, 90].map(m => '<button class="' + (CK.parentMin === m ? 'on' : '') + '" onclick="ck(this,\'parentMin\',' + m + ')">' + m + (m === 90 ? '+' : '') + '</button>').join('') + '</div>' +
+    '<label class="small">Anything else? (optional)<textarea id="ck-note" rows="2">' + esc(CK.note || '') + '</textarea></label>' +
+    '<div class="acts"><button class="primary" onclick="saveCheckin()">Save check-in</button></div></div>' +
+    nextUpBox() + '<div class="card"><h3>Reminders in your calendar</h3><p class="muted small">' + (STATE.calendarAt ? 'Last added ' + esc(STATE.calendarAt) + '. Add again only if the list changed (it replaces the same events).' : 'Not added yet.') + '</p>' + calendarControls() + '</div>';
+}
+function ck(btn, key, v) { CK[key] = v; btn.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn)); }
+function saveCheckin() {
+  if (CK.nudgeOnTime === undefined || !CK.friction) return toast('Answer 1 and 2 first');
+  SS.checkin(STATE, { nudgeOnTime: CK.nudgeOnTime, friction: CK.friction, parentMin: CK.parentMin || 0, note: ($('#ck-note').value || '').trim() }, now());
+  save(); toast('Check-in saved. See you next week.'); TAB = 'list'; render();
+}
+
+// ---- essays -----------------------------------------------------------------------
+function renderEssays() {
+  const list = items().map(it => { const e = (STATE.items || {})[it.id] || {}; if (!e.essayTheme) return it;
+    return Object.assign({}, it, { essay: e.essayTheme === 'none' ? null : Object.assign({ prompt: 'marked by you' }, it.essay, { theme: e.essayTheme }) }); })
+    .filter(it => SS.statusOf(STATE, it.id) !== 'skipped');
+  const g = SS.essayGroups(SS.sortItems(list, now()));
+  const mins = items().reduce((s, it) => s + (((STATE.items || {})[it.id] || {}).essayMin || 0), 0);
+  return '<h2>Write once, use many times</h2><div class="card small"><b>The core-story method.</b> Write one 400–500 word story: why the field you want to study, ' +
+    'with one real example (a project, a club moment or a service hour). For each new prompt keep the facts, rewrite the first and last lines, ' +
+    'and answer that prompt directly. Log your minutes when you mark "Essay drafted".</div>' +
+    (g.groups.length ? g.groups.map(gr => '<div class="card"><h3>' + esc(gr.label) + (gr.items.length > 1 ? ' · one essay → ' + gr.items.length + ' applications' : '') + '</h3><ul>' +
+      gr.items.map(it => '<li>' + esc(it.name) + ' <span class="muted small">(' + esc(it.essay.prompt) + ')</span></li>').join('') + '</ul></div>').join('') : '') +
+    '<div class="card"><h3>No essay listed · quickest wins (' + g.noEssay.length + ')</h3><ul>' + g.noEssay.map(it => '<li>' + esc(it.name) + ' <span class="muted small">' + esc(SS.deadlineLabel(it, now())) + '</span></li>').join('') +
+    '</ul><p class="muted small">Most pages don\'t publish their prompt until you open the form. When you see it, tap the topic on the card (List › What it needs) and this page regroups.</p></div>' +
+    '<p class="muted">Essay minutes logged so far: <b>' + mins + '</b>.</p>';
+}
+
+// ---- pilot numbers (Foundry work 88) ----------------------------------------------------
+function bars(o) {
+  const e = Object.entries(o).sort((a, b) => b[1] - a[1]), max = Math.max(1, ...e.map(x => x[1]));
+  return e.length ? e.map(([k, n]) => '<div class="bar"><span style="width:46%">' + esc(k) + '</span><i style="width:' + (n / max * 40) + '%"></i><b>' + n + '</b></div>').join('') : '<p class="muted small">None yet.</p>';
+}
+function renderPilot() {
+  const m = SS.metrics(items(), STATE, now()), v = SS.verdict(items(), STATE, now()), p = STATE.pilot || {};
+  const bOpts = [0, 1, 2, 3, 4, 5, 'unknown'];
+  return '<h2>Pilot numbers</h2>' +
+    '<div class="grid"><div class="stat"><b>' + m.intended + '</b><span>planned to apply</span></div><div class="stat"><b>' + m.started + '</b><span>started</span></div>' +
+    '<div class="stat"><b>' + m.submitted + '</b><span>submitted</span></div><div class="stat"><b>' + (m.medianDaysStartToSubmit ?? '–') + '</b><span>median days, start → submit</span></div></div>' +
+    '<div class="verdict"><b>Pass/fail rule (team\'s work 88)</b><br>' + esc(v.text) + (v.R ? '<br><span class="small muted">Needs ≥' + v.R + ' submitted, ≥' + v.Dmin + ' open eligible deadlines in the 8 weeks, and 7 of 8 weekly nudges on time. ' + esc(v.baselineNote || '') + '</span>' : '') +
+    '<br><span class="small"><i>' + esc(v.label) + '</i></span></div>' +
+    '<div class="card"><b>Before the pilot: applications submitted in the 8 weeks before starting</b><div class="opts three">' +
+    bOpts.map(b => '<button class="' + (p.baseline === b ? 'on' : '') + '" onclick="setBaseline(' + JSON.stringify(b).replace(/"/g, '&quot;') + ')">' + (b === 'unknown' ? 'Don\'t know' : b === 5 ? '5+' : b) + '</button>').join('') + '</div>' +
+    '<p class="small muted">Day 0: ' + esc(p.day0 || 'not yet (first check-in)') + (v.windowEnd ? ' · window ends ' + esc(v.windowEnd) : '') + (v.frozen ? ' · list frozen' : '') + '</p>' +
+    (p.day0 ? '<button class="ghost" onclick="restart()">Restart the 8-week window today</button>' : '<button class="ghost" onclick="startPilot()">Start the pilot today</button>') + '</div>' +
+    '<div class="card"><h3>Why applications were skipped</h3>' + bars(m.skipReasons) + '</div>' +
+    '<div class="card"><h3>What got submissions done</h3>' + bars(m.promptedBy) + '</div>' +
+    '<div class="card"><h3>What got in the way (weekly)</h3>' + bars(m.frictions) +
+    '<p class="small muted">Check-ins ' + m.checkins + ' · reminder on time ' + m.nudgesOnTime + ' · parent help ' + m.parentMinutes + ' min · essay time ' + m.essayMinutes + ' min</p></div>' +
+    '<div class="card"><h3>Share or save the numbers</h3><div class="acts"><button onclick="shareFile(\'scholarstack-pilot-' + now() + '.csv\', SS.exportCSV(items(), STATE, now()), \'text/csv\')">Spreadsheet (CSV)</button>' +
+    '<button onclick="copySummary()">Copy summary</button></div><div class="acts"><button onclick="backup()">Backup file</button><button onclick="$(\'#restore\').click()">Restore backup</button></div>' +
+    '<input type="file" id="restore" accept="application/json,.json" hidden onchange="restore(this.files[0])"><p class="small muted">Everything stays on this phone until you choose to share it.</p></div>';
+}
+function setBaseline(b) { STATE.pilot = STATE.pilot || {}; STATE.pilot.baseline = b; save(); render(); }
+function startPilot() { STATE.pilot = STATE.pilot || {}; STATE.pilot.day0 = now(); save(); render(); }
+function restart() { if (confirm('Start a fresh 8-week window today? Use this when enough deadlines are open (the rule allows it until ' + SS.HARD_STOP + ').')) { SS.restartWindow(STATE, now()); save(); render(); } }
+async function copySummary() {
+  const t = SS.summaryText(items(), STATE, now());
+  try { await navigator.clipboard.writeText(t); toast('Summary copied'); } catch (e) { sheet('<h3>Summary</h3><textarea rows="9" style="font-size:13px">' + esc(t) + '</textarea>'); }
+}
+function backup() { shareFile('scholarstack-backup-' + now() + '.json', JSON.stringify({ state: STATE, list: LIST }), 'application/json'); }
+function restore(f) {
+  if (!f) return; const r = new FileReader();
+  r.onload = () => { try { const d = JSON.parse(r.result); if (!d.state || typeof d.state !== 'object' || !d.list) throw new Error('not a backup'); d.list = SS.cleanList(d.list);
+    if (!confirm('Replace what is on this phone with this backup?')) return; STATE = SS.cleanState(d.state); LIST = d.list; save(); localStorage.setItem(K_LIST, JSON.stringify(LIST)); render(); toast('Restored');
+  } catch (e) { toast('That file is not a ScholarStack backup'); } };
+  r.readAsText(f);
+}
+
+document.getElementById('nav').addEventListener('click', ev => { const b = ev.target.closest('button'); if (b) { TAB = b.dataset.tab; render(); } });
+window.addEventListener('hashchange', () => { if (/^#[pdj]=/.test(location.hash)) location.reload(); });
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# ScholarStack
+
+> A private scholarship tracker: your list stays on your phone.
+
+## Posts
+
+
+## Pages
+
+- [About ScholarStack](https://tdsnbeer.github.io/scholarstack/about.html)
